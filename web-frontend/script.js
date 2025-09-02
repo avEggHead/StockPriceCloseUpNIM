@@ -1,15 +1,11 @@
-const apiBase = "http://localhost:5000/api";
+const API_BASE = "https://nim-api.happywater-349b476f.eastus.azurecontainerapps.io";
 
-async function searchStocks() {
-  const query = document.getElementById("searchInput").value;
-  const resp = await fetch(`${apiBase}/stocks/search?q=${encodeURIComponent(query)}`);
-  const data = await resp.json();
-  document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+async function searchStocks(query) {
+  const res = await fetch(`${API_BASE}/api/stocks/search?q=${encodeURIComponent(query)}`);
+  return await res.json();
 }
 
-async function getQuote() {
-  const symbol = document.getElementById("quoteInput").value;
-  const resp = await fetch(`${apiBase}/stocks/quote?symbol=${encodeURIComponent(symbol)}`);
-  const data = await resp.json();
-  document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+async function getQuote(symbol) {
+  const res = await fetch(`${API_BASE}/api/stocks/quote?symbol=${encodeURIComponent(symbol)}`);
+  return await res.json();
 }

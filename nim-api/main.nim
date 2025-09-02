@@ -1,47 +1,51 @@
-import asynchttpserver, asyncdispatch, httpclient, os, json, strformat
+import asynchttpserver, asyncdispatch, httpclient, os, strformat
 
 # Base URL for Finnhub
 const finnhubBase = "https://finnhub.io/api/v1"
 
+proc addCORSHeaders(headers: var HttpHeaders) =
+  headers["Access-Control-Allow-Origin"] = "*"
+  headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+  headers["Access-Control-Allow-Headers"] = "Content-Type"
+
 proc handleRequest(req: Request) {.async, gcsafe.} =
   let finnhubApiKey = getEnv("FINNHUB_API_KEY")  # local for GC-safety
+  var headers = newHttpHeaders([("Content-Type","application/json")])
+  addCORSHeaders(headers)
+
+  # Handle preflight OPTIONS requests
+  if req.reqMethod == HttpOptions:
+    await req.respond(Http204, "", headers)
+    return
 
   if req.url.path == "/api/stocks/search":
-    var queryStr = req.url.query  # e.g. "q=apple"
-    var targetUrl = finnhubBase & "/search?" & queryStr & "&token=" & finnhubApiKey
+    let queryStr = req.url.query  # e.g. "q=apple"
+    let targetUrl = finnhubBase & "/search?" & queryStr & "&token=" & finnhubApiKey
 
     try:
       let client = newHttpClient()
       let body = client.getContent(targetUrl)
-      let headers = newHttpHeaders([("Content-Type","application/json")])
       await req.respond(Http200, body, headers)
     except Exception as e:
       let err = fmt"""{{"error":"Failed to reach Finnhub","details":"{e.msg}"}}"""
-      let headers = newHttpHeaders([("Content-Type","application/json")])
       await req.respond(Http500, err, headers)
 
   elif req.url.path == "/api/stocks/quote":
-    var queryStr = req.url.query  # e.g. "symbol=AAPL"
-    var targetUrl = finnhubBase & "/quote?" & queryStr & "&token=" & finnhubApiKey
+    let queryStr = req.url.query  # e.g. "symbol=AAPL"
+    let targetUrl = finnhubBase & "/quote?" & queryStr & "&token=" & finnhubApiKey
 
     try:
       let client = newHttpClient()
       let body = client.getContent(targetUrl)
-      let headers = newHttpHeaders([("Content-Type","application/json")])
       await req.respond(Http200, body, headers)
     except Exception as e:
       let err = fmt"""{{"error":"Failed to reach Finnhub","details":"{e.msg}"}}"""
-      let headers = newHttpHeaders([("Content-Type","application/json")])
       await req.respond(Http500, err, headers)
 
   else:
-    await req.respond(Http404, "Not Found")
+    let err = """{"error":"Not Found"}"""
+    await req.respond(Http404, err, headers)
 
-proc main() {.async.} =
+when isMainModule:
   let server = newAsyncHttpServer()
-  echo "Nim Finnhub API running at http://localhost:5000"
-  await server.serve(Port(5000), proc (req: Request): Future[void] {.async, gcsafe.} =
-    await handleRequest(req)
-  )
-
-waitFor main()
+  waitFor server.serve(Port(5000), handleRequest)
