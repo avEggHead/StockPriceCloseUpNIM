@@ -1,0 +1,44 @@
+name: Deploy Nim API
+
+on:
+  workflow_dispatch:   # manual trigger
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # ---- Build & Push Docker Image to Docker Hub ----
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          cd nim-api
+          docker build -t ${{ secrets.DOCKERHUB_USER }}/nim-api:latest .
+          docker push ${{ secrets.DOCKERHUB_USER }}/nim-api:latest
+
+      # ---- Deploy to Azure Container Apps ----
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Nim API to Azure Container Apps
+        run: |
+          az containerapp create \
+            --name nim-api \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --environment ${{ secrets.AZURE_CONTAINER_ENV }} \
+            --image docker.io/${{ secrets.DOCKERHUB_USER }}/nim-api:latest \
+            --target-port 5000 \
+            --ingress external \
+            --cpu 0.5 \
+            --memory 1.0Gi \
+            --env-vars FINNHUB_API_KEY=${{ secrets.FINNHUB_API_KEY }}

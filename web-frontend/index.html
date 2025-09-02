@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Nim Finnhub Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    button { margin-top: 1rem; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Stock Lookup (Nim + Finnhub)</h1>
+
+  <div>
+    <label for="searchInput">Search Symbol/Name:</label>
+    <input type="text" id="searchInput" value="apple">
+    <button onclick="searchStocks()">Search</button>
+  </div>
+
+  <div>
+    <label for="quoteInput">Get Quote (Symbol):</label>
+    <input type="text" id="quoteInput" value="AAPL">
+    <button onclick="getQuote()">Get Quote</button>
+  </div>
+
+  <h2>Results:</h2>
+  <pre id="output"></pre>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+name: Setup Azure Infra for Nim API
+
+on:
+  workflow_dispatch:   # run manually
+
+jobs:
+  setup-infra:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Create resource group
+        run: |
+          az group create \
+            --name ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --location eastus
+
+      - name: Create Container Apps environment
+        run: |
+          az containerapp env create \
+            --name ${{ secrets.AZURE_CONTAINER_ENV }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --location eastus
