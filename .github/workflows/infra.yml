@@ -24,7 +24,7 @@ jobs:
 
       - name: Create Container Apps environment
         run: |
-          az containerapp env create \
-            --name ${{ secrets.AZURE_CONTAINER_ENV }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            az containerapp env create \
+            -n ${{ secrets.AZURE_CONTAINER_ENV }} \
+            -g ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --location eastus
