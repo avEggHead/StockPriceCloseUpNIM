@@ -16,17 +16,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Create Resource Group
-        run: |
-          az group create \
-            --name ${{ secrets.AZURE_FRONTEND_RG }} \
-            --location eastus
-
       - name: Create Storage Account
         run: |
           az storage account create \
             --name ${{ secrets.AZURE_STORAGE_ACCOUNT }} \
-            --resource-group ${{ secrets.AZURE_FRONTEND_RG }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --location eastus \
             --sku Standard_LRS \
             --kind StorageV2
@@ -38,3 +32,8 @@ jobs:
             --static-website \
             --index-document index.html \
             --404-document index.html
+
+      - name: Show Static Site URL
+        run: |
+          echo "Your static site is at:"
+          echo "https://${{ secrets.AZURE_STORAGE_ACCOUNT }}.z13.web.core.windows.net"
