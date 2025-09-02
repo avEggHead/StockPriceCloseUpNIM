@@ -1,31 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Nim Finnhub Demo</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    button { margin-top: 1rem; }
-    pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Stock Lookup (Nim + Finnhub)</h1>
+  <header class="navbar">
+    <h1 class="navbar-brand">📈 Stock Price Close-Up</h1>
+  </header>
 
-  <div>
-    <label for="searchInput">Search Symbol/Name:</label>
-    <input type="text" id="searchInput" value="apple">
-    <button onclick="searchStocks()">Search</button>
-  </div>
+  <main>
+    <div class="card">
+      <h2>🔍 Search by Name</h2>
+      <input type="text" id="searchBox" class="form-control" placeholder="Enter stock name">
+      <button class="btn btn-primary" onclick="doSearch()">Search</button>
+      <ul id="searchResults"></ul>
+    </div>
 
-  <div>
-    <label for="quoteInput">Get Quote (Symbol):</label>
-    <input type="text" id="quoteInput" value="AAPL">
-    <button onclick="getQuote()">Get Quote</button>
-  </div>
+    <div class="card">
+      <h2>💵 Get Quote</h2>
+      <input type="text" id="quoteInput" class="form-control" placeholder="e.g. AAPL">
+      <button class="btn btn-primary" onclick="doQuote()">Get Quote</button>
+      <div id="quoteResult"></div>
+    </div>
+  </main>
 
-  <h2>Results:</h2>
-  <pre id="output"></pre>
+  <footer>
+    <p>Stock Price Close-Up Powered by Nim + Finnhub API</p>
+  </footer>
 
   <script src="script.js"></script>
 </body>
